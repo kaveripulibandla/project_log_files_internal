@@ -36,11 +36,14 @@ def create_rawlayer():
     df_col.printSchema()
 
     df_col.show(truncate = False)
+    
 
-    df_col.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/Raw/Raw_data.csv")
+    # save raw data in s3
+    df_col.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/Raw/raw_log_details")
+    
+
+    # RAW_DATA HIVE TABLE
     df_col.write.mode("overwrite").saveAsTable("raw_data_table")
-    # df_col.createOrReplaceTempView()
-
     df_log = spark.sql("select * from raw_data_table")
     df_log.show()
 
