@@ -2,4 +2,4 @@
 
 task1: 
 
-creating and file from the sample text
+creating an increased file from the sample text
