@@ -4,6 +4,7 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import *
 from pyspark.sql.types import *
 import pyspark.sql.functions as F
+from pyspark.sql.functions import regexp_replace
 
 
 def log_curated_layer():
@@ -79,14 +80,12 @@ def log_curated_layer():
     curated_data.na.fill("Nan").show(truncate = False)
 
     # convert the column size bytes in to kb
-    curated_data1 = curtaed_data.withColumn("size",round(col("size")/1024,2))
+    curated_data1 = curated_data.withColumn("size",round(col("size")/1024,2))
     curated_data1.show()
 
 
 
     """## #Replace part of get with put in request column"""
-
-    from pyspark.sql.functions import regexp_replace
 
     final_curated = curated_data1.withColumn('method', regexp_replace('method', 'GET', 'PUT'))
     final_curated.show(truncate=False)
@@ -109,8 +108,9 @@ def log_curated_layer():
     # #Log_agg_per_devic
     """
 
-    df_grp_get = final_cleansed.groupBy("method").agg(count("method").alias("method_count"))
+    df_grp_get = final_curated.groupBy("method").agg(count("method").alias("method_count"))
     df_grp_get.show()
+
 
     def split_date(val):
       return val.split(":")[0]
@@ -119,7 +119,8 @@ def log_curated_layer():
 
 
     cnt_cond = lambda cond: sum(when(cond, 1).otherwise(0))
-    log_agg_per_device = final_cleansed.withColumn("day_hour", split_date_udf(col("datetime"))).groupBy("day_hour", "client_ip") \
+
+    log_agg_per_device = final_curated.withColumn("day_hour", split_date_udf(col("datetime"))).groupBy("day_hour", "client_ip") \
                                                     .agg(cnt_cond(col('method') == "PUT").alias("no_put"), \
                                                          cnt_cond(col('method') == "POST").alias("no_post"), \
                                                          cnt_cond(col('method') == "HEAD").alias("no_head"), \
@@ -161,7 +162,7 @@ def log_curated_layer():
     log_agg_across_device.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/curated/log_agg_across_device_data")
 
     # LOG_ACROSS_DEVICE HIVE TABLE
-    
+
     log_agg_across_device.write.mode("overwrite").saveAsTable("curated_across_device_table")
     across_device_hive = spark.sql("select * from curated_across_device_table")
     across_device_hive.show()

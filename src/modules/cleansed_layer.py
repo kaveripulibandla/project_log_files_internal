@@ -83,7 +83,7 @@ def log_cleansed_layer():
     curated_data.na.fill("Nan").show(truncate = False)
 
     # convert the column size bytes in to kb
-    curated_data1 = curtaed_data.withColumn("size",round(col("size")/1024,2))
+    curated_data1 = curated_data.withColumn("size",round(col("size")/1024,2))
     curated_data1.show()
 
     """## #Replace part of get with put in request column"""
