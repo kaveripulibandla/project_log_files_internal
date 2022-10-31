@@ -112,18 +112,18 @@ def log_curated_layer():
     df_grp_get.show()
 
 
-    def split_date(val):
+    def spliting_date(val):
       return val.split(":")[0]
 
-    split_date_udf = udf(lambda x: split_date(x), StringType())
+    spliting_date_udf = udf(lambda x: spliting_date(x), StringType())
 
 
-    cnt_cond = lambda cond: sum(when(cond, 1).otherwise(0))
+    apply_cond = lambda x: sum(when(x, 1).otherwise(0))
 
-    log_agg_per_device = final_curated.withColumn("day_hour", split_date_udf(col("datetime"))).groupBy("day_hour", "client_ip") \
-                                                    .agg(cnt_cond(col('method') == "PUT").alias("no_put"), \
-                                                         cnt_cond(col('method') == "POST").alias("no_post"), \
-                                                         cnt_cond(col('method') == "HEAD").alias("no_head"), \
+    log_agg_per_device = final_curated.withColumn("day_hour", spliting_date_udf(col("datetime"))).groupBy("day_hour", "client_ip") \
+                                                    .agg(apply_cond(col('method') == "PUT").alias("no_put"), \
+                                                         apply_cond(col('method') == "POST").alias("no_post"), \
+                                                         apply_cond(col('method') == "HEAD").alias("no_head"), \
                                                         ).orderBy(asc("day_hour")).withColumn("row_id", monotonically_increasing_id())\
                                   .select("row_id", "day_hour","client_ip","no_put","no_post","no_head")
     log_agg_per_device.show()
@@ -169,5 +169,4 @@ def log_curated_layer():
 
 
 if __name__ == '__main__':
-
     log_curated_layer()
