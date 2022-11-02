@@ -90,7 +90,7 @@ def log_cleansed_layer():
 
     #Replace part of get with put in request column
 
-    final_curated = curated_data1.withColumn('method', regexp_replace('method', 'GET', 'PUT'))
+    final_curated = curated_data1.withColumn('method', regexp_replace('method', 'GET', 'GET'))
     final_curated.show(truncate=False)
 
 
