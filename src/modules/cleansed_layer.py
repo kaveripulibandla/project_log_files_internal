@@ -73,26 +73,24 @@ def log_cleansed_layer():
 
 
 
-    """## #i)Remove any special characters in the request column(% ,- ? =)"""
-
-    curated_data = cleansed_data.withColumn('request', regexp_replace('request', '%|,|-|\?=', ''))
-    curated_data.show(truncate = False)
-
-    """## #iv) Replace null with NA"""
-
-    curated_data.na.fill("Nan").show(truncate = False)
-
-    # convert the column size bytes in to kb
-    curated_data1 = curated_data.withColumn("size",round(col("size")/1024,2))
-    curated_data1.show()
-
-    """## #Replace part of get with put in request column"""
-
-    #Replace part of get with put in request column
-
-    final_curated = curated_data1.withColumn('method', regexp_replace('method', 'GET', 'GET'))
-    final_curated.show(truncate=False)
-
 
 if __name__ == '__main__':
 	log_cleansed_layer()
+
+
+
+    # """## #i)Remove any special characters in the request column(% ,- ? =)"""
+
+    # curated_data = cleansed_data.withColumn('request', regexp_replace('request', '%|,|-|\?=', ''))
+    # curated_data.show(truncate = False)
+
+    # """## #iv) Replace null with NA"""
+
+    # curated_data.na.fill("Nan").show(truncate = False)
+
+    # # convert the column size bytes in to kb
+    # curated_data1 = curated_data.withColumn("size",round(col("size")/1024,2))
+    # curated_data1.show()
+
+    # """## #Replace part of get with put in request column"""
+

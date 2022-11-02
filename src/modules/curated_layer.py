@@ -87,18 +87,18 @@ def log_curated_layer():
 
     """## #Replace part of get with put in request column"""
 
-    final_curated = curated_data1.withColumn('method', regexp_replace('method', 'GET', 'GET'))
-    final_curated.show(truncate=False)
+    # final_curated = curated_data1.withColumn('method', regexp_replace('method', 'GET', 'GET'))
+    # final_curated.show(truncate=False)
 
 
     # save curated data in s3
 
-    final_curated.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/curated/curate_log_details")
+    curated_data1.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/curated/curate_log_details")
 
     #CURATED_HIVE TABLE
 
-    final_curated.write.mode("overwrite").saveAsTable("curated_data_table")
-    curated_hive = spark.sql("select * from curated_data_table")
+    curated_data1.write.mode("overwrite").saveAsTable("curate_log_details")
+    curated_hive = spark.sql("select * from curate_log_details")
     curated_hive.show()
 
 
@@ -108,7 +108,7 @@ def log_curated_layer():
     # #Log_agg_per_devic
     """
 
-    df_grp_get = final_curated.groupBy("method").agg(count("method").alias("method_count"))
+    df_grp_get = curated_data1.groupBy("method").agg(count("method").alias("method_count"))
     df_grp_get.show()
 
 
@@ -120,7 +120,7 @@ def log_curated_layer():
 
     apply_cond = lambda x: sum(when(x, 1).otherwise(0))
 
-    log_agg_per_device = final_curated.withColumn("day_hour", spliting_date_udf(col("datetime"))).groupBy("day_hour", "client_ip") \
+    log_agg_per_device = curated_data1.withColumn("day_hour", spliting_date_udf(col("datetime"))).groupBy("day_hour", "client_ip") \
                                                     .agg(apply_cond(col('method') == "GET").alias("no_get"), \
                                                          apply_cond(col('method') == "POST").alias("no_post"), \
                                                          apply_cond(col('method') == "HEAD").alias("no_head"), \
@@ -139,8 +139,8 @@ def log_curated_layer():
 
     # LOG_PER_DEVICE HIVE TABLE
 
-    log_agg_per_device.write.mode("overwrite").saveAsTable("curated_per_device_table")
-    per_device_hive = spark.sql("select * from curated_per_device_table")
+    log_agg_per_device.write.mode("overwrite").saveAsTable("log_agg_per_device")
+    per_device_hive = spark.sql("select * from log_agg_per_device")
     per_device_hive.show()
 
 
@@ -163,8 +163,8 @@ def log_curated_layer():
 
     # LOG_ACROSS_DEVICE HIVE TABLE
 
-    log_agg_across_device.write.mode("overwrite").saveAsTable("curated_across_device_table")
-    across_device_hive = spark.sql("select * from curated_across_device_table")
+    log_agg_across_device.write.mode("overwrite").saveAsTable("log_agg_across_device")
+    across_device_hive = spark.sql("select * from log_agg_across_device")
     across_device_hive.show()
 
 
