@@ -14,8 +14,8 @@ def create_rawlayer():
     """# #Log_Details(raw_layer)"""
 
     # Read CSV File and Write to Table
-    # df = spark.read.option("delimiter"," ").csv("C:\\Users\\kaverip\\Downloads\\299999.text")
-    df = spark.read.option("delimiter"," ").csv("s3://managed-kafka-kaveri-new/kafka_log_files/file-topic/0/299999.text")
+    df = spark.read.option("delimiter"," ").csv("C:\\Users\\kaverip\\Downloads\\299999.text")
+    # df = spark.read.option("delimiter"," ").csv("s3://managed-kafka-kaveri-new/kafka_log_files/file-topic/0/299999.text")
     df.show(truncate = False)
 
     # Giving col names to each columns
@@ -39,12 +39,12 @@ def create_rawlayer():
     
 
     # save raw data in s3
-    df_col.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/Raw/raw_log_details")
+    # df_col.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/Raw/raw_log_details")
     
 
     # RAW_DATA HIVE TABLE
-    df_col.write.mode("overwrite").saveAsTable("raw_data_table")
-    df_log = spark.sql("select * from raw_data_table")
+    df_col.write.mode("overwrite").saveAsTable("raw_log_details")
+    df_log = spark.sql("select * from raw_log_details")
     df_log.show()
 
 if __name__ == '__main__':
