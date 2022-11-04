@@ -8,17 +8,21 @@ import pyspark.sql.functions as F
 
 
 def create_rawlayer():
+
     spark = SparkSession.builder.appName("Demo-Project2").config("spark.master","local").enableHiveSupport().getOrCreate()
     spark
 
     """# #Log_Details(raw_layer)"""
 
-    # Read CSV File and Write to Table
+    """# Read CSV File and Write to Table"""""
+
     df = spark.read.option("delimiter"," ").csv("C:\\Users\\kaverip\\Downloads\\299999.text")
+    # df_col.write.mode("overwrite").format('csv').option("header", True).save("C:\\project_log_files_internal\\src\\internal_files\\raw_log_file")
     # df = spark.read.option("delimiter"," ").csv("s3://managed-kafka-kaveri-new/kafka_log_files/file-topic/0/299999.text")
+
     df.show(truncate = False)
 
-    # Giving col names to each columns
+    """# Giving col names to each columns"""
 
     # import pyspark.sql.functions as F
     df_col = (df.select(
@@ -36,16 +40,18 @@ def create_rawlayer():
     df_col.printSchema()
 
     df_col.show(truncate = False)
-    
+    df_col.write.mode("overwrite").format('csv').option("header", True).save(
+        "C:\\project_log_files_internal\\src\\internal_files\\raw_log_file")
 
     # save raw data in s3
     # df_col.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/Raw/raw_log_details")
-    
 
     # RAW_DATA HIVE TABLE
     df_col.write.mode("overwrite").saveAsTable("raw_log_details")
     df_log = spark.sql("select * from raw_log_details")
     df_log.show()
+
+    df_log = spark.sql("select count(*) from raw_log_details").show()
 
 if __name__ == '__main__':
     create_rawlayer()
