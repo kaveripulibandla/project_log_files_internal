@@ -52,7 +52,7 @@ def create_rawlayer():
         "sfPassword": "Welcome@1",
         "sfDatabase": "KAVERI_DB",
         "sfSchema": "PUBLIC",
-        "sfWarehouse": "KAVERI_WH",
+        "sfWarehouse": "COMPUTE_WH",
         "sfRole": "ACCOUNTADMIN"
     }
 

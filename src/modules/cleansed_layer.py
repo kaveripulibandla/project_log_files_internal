@@ -20,7 +20,7 @@ def log_cleansed_layer():
 
     # Read CSV File and Write to Table
     df = spark.read.option("header", True)\
-        .csv("C:\\project_log_files_internal\\src\\internal_files\\raw_log_file")
+        .csv("C:\\project_log_files_internal\\src\\internal_files\\raw_log_file\\raw_data.csv")
 
     # df = spark.read.option("delimiter", " ").csv("s3://managed-kafka-kaveri-new/kafka_log_files/file-topic/0/299999.text")
 

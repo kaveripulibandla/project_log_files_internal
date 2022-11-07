@@ -23,7 +23,7 @@ def log_curated_layer():
     # Read CSV File and Write to Table
     df_curated = spark.read.option("header", True) \
         .csv(
-        "C:\\project_log_files_internal\\src\\internal_files\\cleanse_log_file")
+        "C:\\project_log_files_internal\\src\\internal_files\\cleanse_log_file\\clean_data.csv")
 
     #     "s3://managed-kafka-kaveri-new/kafka_log_files/file-topic/0/299999.text")
     df_curated.show(truncate=False)
