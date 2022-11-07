@@ -74,6 +74,7 @@ def log_cleansed_layer():
     cleansed_hive.show(truncate = False)
 
     cleansed_hive = spark.sql("select count(*) from cleanse_log_details").show()
+
     sfOptions = {
         "sfURL": r"https://tm57257.europe-west4.gcp.snowflakecomputing.com/",
         "sfAccount": "tm57257",
@@ -86,7 +87,7 @@ def log_cleansed_layer():
     }
 
     cleansed_data.write.format("snowflake").options(**sfOptions).option("dbtable",
-                                                                 "{}".format(r"cleansed_log_details")).mode(
+                                                                 "{}".format(r"kaveri_cleansed_log_details")).mode(
         "overwrite").options(header=True).save()
     spark.stop
 

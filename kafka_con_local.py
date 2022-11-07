@@ -1,6 +1,4 @@
 
-
-
 from time import sleep
 from json import dumps
 from kafka import KafkaProducer
@@ -18,7 +16,7 @@ class augment:
     incrementBy = 0
     input_file_object = open(input_filename, 'r')
 
-    file_object = open('increasing_log_file1.txt', 'a')
+    file_object = open('increasing_log_file.txt', 'a')
 
     def changer(self):
         self.input_file_object.seek(0)

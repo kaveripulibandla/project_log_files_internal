@@ -38,9 +38,12 @@ def create_rawlayer():
         ))
 
     df_col.printSchema()
-
     df_col.show(truncate = False)
-    df_col.write.mode("overwrite").format('csv').option("header", True).save(
+
+    df_col1 = df_col.na.fill("Nan")
+    df_col1.show(truncate=False)
+
+    df_col1.write.mode("overwrite").format('csv').option("header", True).save(
         "C:\\project_log_files_internal\\src\\internal_files\\raw_log_file")
     sfOptions = {
         "sfURL": r"https://tm57257.europe-west4.gcp.snowflakecomputing.com/",
@@ -53,7 +56,7 @@ def create_rawlayer():
         "sfRole": "ACCOUNTADMIN"
     }
 
-    df_col.write.format("snowflake").options(**sfOptions).option("dbtable", "{}".format(r"Kaveri_raw_log_details")).mode(
+    df_col1.write.format("snowflake").options(**sfOptions).option("dbtable", "{}".format(r"Kaveri_raw_log_details")).mode(
         "overwrite").options(header=True).save()
 
     # SnowflakeHelper().save_df_to_snowflake(df_col, env.sf_raw_table)
@@ -62,7 +65,7 @@ def create_rawlayer():
     # df_col.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/Raw/raw_log_details")
 
     # RAW_DATA HIVE TABLE
-    df_col.write.mode("overwrite").saveAsTable("raw_log_details")
+    df_col1.write.mode("overwrite").saveAsTable("raw_log_details")
     df_log = spark.sql("select * from raw_log_details")
     df_log.show()
 
