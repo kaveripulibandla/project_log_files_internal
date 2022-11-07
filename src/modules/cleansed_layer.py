@@ -5,19 +5,22 @@ from pyspark.sql.functions import *
 from pyspark.sql.types import *
 import pyspark.sql.functions as F
 from pyspark.sql.functions import regexp_replace
+# from helpers.snowflake_helper import SnowflakeHelper
 
+# import env
 
 def log_cleansed_layer():
 
-    spark = SparkSession.builder.appName("Demo-Project2").config("spark.master",
-                                                                 "local").enableHiveSupport().getOrCreate()
+    spark = SparkSession.builder.enableHiveSupport() \
+        .config('spark.jars.packages',
+                'net.snowflake:snowflake-jdbc:3.13.23,net.snowflake:spark-snowflake_2.12:2.11.0-spark_3.3').getOrCreate()
     spark
 
     """# #data reading from Log_Details(raw_layer)"""
 
     # Read CSV File and Write to Table
     df = spark.read.option("header", True)\
-        .csv("C:\\project_log_files_internal\\src\\internal_files\\raw_log_file\\part-00000-c8822398-8138-4322-b3a4-4f2c1c3c4d60-c000.csv")
+        .csv("C:\\project_log_files_internal\\src\\internal_files\\raw_log_file")
 
     # df = spark.read.option("delimiter", " ").csv("s3://managed-kafka-kaveri-new/kafka_log_files/file-topic/0/299999.text")
 
@@ -59,6 +62,8 @@ def log_cleansed_layer():
     cleansed_data.write.mode("overwrite").format('csv').option("header", True).save(
         "C:\\project_log_files_internal\\src\\internal_files\\cleanse_log_file")
 
+    # SnowflakeHelper().save_df_to_snowflake(cleansed_data, env.sf_cleansed_table)
+
     # Save cleansed_data in s3
     # cleansed_data.mode("overwrite").format('csv').option("header", True).save(
     #     "s3://databrickskaveri/final_layer/cleansed/cleanse_log_details")
@@ -69,9 +74,24 @@ def log_cleansed_layer():
     cleansed_hive.show(truncate = False)
 
     cleansed_hive = spark.sql("select count(*) from cleanse_log_details").show()
+    sfOptions = {
+        "sfURL": r"https://tm57257.europe-west4.gcp.snowflakecomputing.com/",
+        "sfAccount": "tm57257",
+        "sfUser": "TESTDATA",
+        "sfPassword": "Welcome@1",
+        "sfDatabase": "KAVERI_DB",
+        "sfSchema": "PUBLIC",
+        "sfWarehouse": "COMPUTE_WH",
+        "sfRole": "ACCOUNTADMIN"
+    }
+
+    cleansed_data.write.format("snowflake").options(**sfOptions).option("dbtable",
+                                                                 "{}".format(r"cleansed_log_details")).mode(
+        "overwrite").options(header=True).save()
+    spark.stop
 
 if __name__ == '__main__':
     log_cleansed_layer()
-
+    # SnowflakeHelper().save_df_to_snowflake(obj, env.sf_cleansed_table)
 
 
