@@ -23,7 +23,7 @@ def log_curated_layer():
     # Read CSV File and Write to Table
     df_curated = spark.read.option("header", True) \
         .csv(
-        "C:\\project_log_files_internal\\src\\internal_files\\cleanse_log_file\\clean_data.csv")
+        "C:\\project_log_files_internal\\src\\internal_files\\cleanse_log_file.csv")
 
     #     "s3://managed-kafka-kaveri-new/kafka_log_files/file-topic/0/299999.text")
     df_curated.show(truncate=False)
@@ -50,28 +50,29 @@ def log_curated_layer():
     # final_curated = curated_data.withColumn("size_in_kb", round(col("size") / 1024, 2))
     final_curated.show(truncate = False)
 
-    final_curated.write.mode("overwrite").format('csv').option("header", True).save(
-        "C:\\project_log_files_internal\\src\\internal_files\\curate_log_file")
+    final_curated.coalesce(1).write.mode("overwrite").format('csv').option("header", True).save(
+        "C:\\project_log_files_internal\\src\\internal_files\\curate_log_file.csv")
+
     # SnowflakeHelper().save_df_to_snowflake(final_curated, env.sf_curated_table)
     sfOptions = {
-        "sfURL": r"https://tm57257.europe-west4.gcp.snowflakecomputing.com/",
-        "sfAccount": "tm57257",
-        "sfUser": "TESTDATA",
-        "sfPassword": "Welcome@1",
+        "sfURL": r"https://hisswyy-qi52071.snowflakecomputing.com/",
+        "sfAccount": "su57550",
+        "sfUser": "sunil",
+        "sfPassword": "Cloud@123",
         "sfDatabase": "KAVERI_DB",
         "sfSchema": "PUBLIC",
-        "sfWarehouse": "KAVERI_WH",
+        "sfWarehouse": "COMPUTE_WH",
         "sfRole": "ACCOUNTADMIN"
     }
-
-    final_curated.write.format("snowflake").options(**sfOptions).option("dbtable", "{}".format(r"kaveri_curated_log_details")).mode("overwrite").options(header=True).save()
+    final_curated.coalesce(1).write.format("snowflake").options(**sfOptions) \
+        .option("dbtable", "{}".format(r"curated_log_details")).mode("overwrite").options(header=True).save()
 
     # save curated data in s3
     # curated_data1.write.mode("overwrite").format('csv').option("header", True).save("s3://databrickskaveri/final_layer/curated/curate_log_details")
 
     # CURATED_HIVE TABLE
     #
-    final_curated.write.mode("overwrite").saveAsTable("curate_log_details")
+    final_curated.coalesce(1).write.mode("overwrite").saveAsTable("curate_log_details")
     curated_hive = spark.sql("select * from curate_log_details")
     curated_hive.show(truncate = False)
 
@@ -99,25 +100,22 @@ def log_curated_layer():
 
     log_agg_per_device.orderBy(col("row_id").desc()).show(truncate=False)
 
-    log_agg_per_device.write.mode("overwrite").format('csv').option("header", True).save(
-        "C:\\project_log_files_internal\\src\\internal_files\\log_agg_per_device_file")
+    log_agg_per_device.coalesce(1).write.mode("overwrite").format('csv').option("header", True).save(
+        "C:\\project_log_files_internal\\src\\internal_files\\log_agg_per_device_file.csv")
 
     # SnowflakeHelper().save_df_to_snowflake(log_agg_per_device, env.sf_log_agg_per_device_table)
     sfOptions = {
-        "sfURL": r"https://tm57257.europe-west4.gcp.snowflakecomputing.com/",
-        "sfAccount": "tm57257",
-        "sfUser": "TESTDATA",
-        "sfPassword": "Welcome@1",
+        "sfURL": r"https://hisswyy-qi52071.snowflakecomputing.com/",
+        "sfAccount": "su57550",
+        "sfUser": "sunil",
+        "sfPassword": "Cloud@123",
         "sfDatabase": "KAVERI_DB",
         "sfSchema": "PUBLIC",
-        "sfWarehouse": "KAVERI_WH",
+        "sfWarehouse": "COMPUTE_WH",
         "sfRole": "ACCOUNTADMIN"
     }
-
-    log_agg_per_device.write.format("snowflake").options(**sfOptions).option("dbtable",
-                                                                             "{}".format(
-                                                                                 r"kaveri_log_agg_per_device")).mode(
-        "overwrite").options(header=True).save()
+    log_agg_per_device.coalesce(1).write.format("snowflake").options(**sfOptions) \
+        .option("dbtable", "{}".format(r"log_agg_per_devices")).mode("overwrite").options(header=True).save()
 
 
     # save per device in s3
@@ -127,7 +125,7 @@ def log_curated_layer():
 
     # LOG_PER_DEVICE HIVE TABLE
     #
-    log_agg_per_device.write.mode("overwrite").saveAsTable("log_agg_per_device")
+    log_agg_per_device.coalesce(1).write.mode("overwrite").saveAsTable("log_agg_per_device")
     per_device_hive = spark.sql("select * from log_agg_per_device")
     per_device_hive.show(truncate = False)
 
@@ -142,8 +140,8 @@ def log_curated_layer():
 
     log_agg_across_device.show(truncate = False)
 
-    log_agg_across_device.write.mode("overwrite").format('csv').option("header", True)\
-        .save("C:\\project_log_files_internal\\src\\internal_files\\log_agg_across_device_file")
+    log_agg_across_device.coalesce(1).write.mode("overwrite").format('csv').option("header", True)\
+        .save("C:\\project_log_files_internal\\src\\internal_files\\log_agg_across_device_file.csv")
 
     # SnowflakeHelper().save_df_to_snowflake(log_agg_across_device, env.sf_log_agg_across_device_table)
 
@@ -154,7 +152,7 @@ def log_curated_layer():
 
    # LOG_ACROSS_DEVICE HIVE TABLE
 
-    log_agg_across_device.write.mode("overwrite").saveAsTable("log_agg_across_device")
+    log_agg_across_device.coalesce(1).write.mode("overwrite").saveAsTable("log_agg_across_device")
     across_device_hive = spark.sql("select * from log_agg_across_device")
     across_device_hive.show()
 
@@ -163,20 +161,17 @@ def log_curated_layer():
     per_device_hive = spark.sql("select count(*) from log_agg_per_device").show()
 
     sfOptions = {
-        "sfURL": r"https://tm57257.europe-west4.gcp.snowflakecomputing.com/",
-        "sfAccount": "tm57257",
-        "sfUser": "TESTDATA",
-        "sfPassword": "Welcome@1",
+        "sfURL": r"https://hisswyy-qi52071.snowflakecomputing.com/",
+        "sfAccount": "su57550",
+        "sfUser": "sunil",
+        "sfPassword": "Cloud@123",
         "sfDatabase": "KAVERI_DB",
         "sfSchema": "PUBLIC",
-        "sfWarehouse": "KAVERI_WH",
+        "sfWarehouse": "COMPUTE_WH",
         "sfRole": "ACCOUNTADMIN"
     }
-
-    log_agg_across_device.write.format("snowflake").options(**sfOptions).option("dbtable",
-                                                                             "{}".format(
-                                                                                 r"kaveri_log_agg_across_device")).mode(
-        "overwrite").options(header=True).save()
+    log_agg_across_device.coalesce(1).write.format("snowflake").options(**sfOptions) \
+        .option("dbtable", "{}".format(r"log_agg_across_devices")).mode("overwrite").options(header=True).save()
 
 
 if __name__ == '__main__':
