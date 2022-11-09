@@ -16,7 +16,7 @@ def create_rawlayer():
     """# #Log_Details(raw_layer)"""
 
     """# Read CSV File and Write to Table"""""
-    df = spark.read.option("delimiter"," ").csv("C:\\Users\\kaverip\\Downloads\\299999.text")
+    df = spark.read.option("delimiter"," ").csv("C:\\Users\\kaverip\\Downloads\\project-demo-processed-input.txt")
 
     # .csv("s3://managed-kafka-kaveri-new/kafka_log_files/file-topic/0/299999.text")
 
