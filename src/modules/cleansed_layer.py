@@ -28,10 +28,6 @@ def log_cleansed_layer():
 
     """## ##Log_details(Cleansed_layer)"""
 
-    # Removing the [] in datetime column by using regex replace func
-    # df_clean = df.withColumn('datetime', regexp_replace('datetime', '\[|\]|', ''))
-    # df_clean.show()
-
     df_date = df.withColumn("datetime", to_timestamp("datetime", "dd/MMM/yyyy:HH:mm:ss")).withColumn('datetime',
                                                                                                            date_format(
                                                                                                                col("datetime"),
@@ -90,6 +86,6 @@ def log_cleansed_layer():
 
 if __name__ == '__main__':
     log_cleansed_layer()
-    # SnowflakeHelper().save_df_to_snowflake(obj, env.sf_cleansed_table)
+
 
 

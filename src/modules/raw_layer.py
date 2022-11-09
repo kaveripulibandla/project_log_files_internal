@@ -17,14 +17,13 @@ def create_rawlayer():
 
     """# Read CSV File and Write to Table"""""
     df = spark.read.option("delimiter"," ").csv("C:\\Users\\kaverip\\Downloads\\299999.text")
-    # df = spark.read.option("delimiter"," ")
+
     # .csv("s3://managed-kafka-kaveri-new/kafka_log_files/file-topic/0/299999.text")
 
     df.show(truncate = False)
 
     """# Giving col names to each columns"""
 
-    # import pyspark.sql.functions as F
     df_col = (df.select(
         F.monotonically_increasing_id().alias('row_id'),
         F.col("_c0").alias("client_ip"),
@@ -40,7 +39,12 @@ def create_rawlayer():
     df_col.printSchema()
     df_col.show(truncate = False)
 
-    df_col1 = df_col.withColumn('datetime', regexp_replace('datetime', '\[|\]|', ''))
+    df_col1 = df_col.withColumn('datetime', regexp_replace('datetime', '\[|\]|', '')) \
+        .dropDuplicates(["client_ip", "datetime", "method"]) \
+        .drop("row_id") \
+        .withColumn('row_id', monotonically_increasing_id()) \
+        .select('row_id', 'client_ip', 'datetime', 'method', 'request', 'status_code','size','referrer','user_agent')
+
     df_col1.show(truncate=False)
 
     df_col1.coalesce(1).write.mode("overwrite").format('csv')\
@@ -64,7 +68,7 @@ def create_rawlayer():
     # save raw data in s3
     # df_col.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/Raw/raw_log_details")
 
-    # RAW_DATA HIVE TABLE
+    """"" # RAW_DATA HIVE TABLE """""
     df_col1.coalesce(1).write.mode("overwrite").saveAsTable("raw_log_details")
     df_log = spark.sql("select * from raw_log_details")
     df_log.show()
@@ -74,5 +78,3 @@ def create_rawlayer():
 
 if __name__ == '__main__':
     create_rawlayer()
-
-    # SnowflakeHelper().save_df_to_snowflake(obj, env.sf_raw_table)
