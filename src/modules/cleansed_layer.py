@@ -74,14 +74,14 @@ def log_cleansed_layer():
     cleansed_hive = spark.sql("select count(*) from cleanse_log_details").show()
 
     sfOptions = {
-        "sfURL": r"https://hisswyy-qi52071.snowflakecomputing.com/",
-        "sfAccount": "su57550",
-        "sfUser": "sunil",
-        "sfPassword": "Cloud@123",
-        "sfDatabase": "KAVERI_DB",
-        "sfSchema": "PUBLIC",
-        "sfWarehouse": "COMPUTE_WH",
-        "sfRole": "ACCOUNTADMIN"
+        "sfURL": "sfURL",
+        "sfAccount": "sfAccount",
+        "sfUser": "sfUser",
+        "sfPassword": "sfPassword",
+        "sfDatabase": "sfDatabase",
+        "sfSchema": "sfSchema",
+        "sfWarehouse": "sfWarehouse",
+        "sfRole": "sfRole"
     }
     cleansed_data.coalesce(1).write.format("snowflake").options(**sfOptions) \
         .option("dbtable", "{}".format(r"cleansed_log_details")).mode("overwrite").options(header=True).save()

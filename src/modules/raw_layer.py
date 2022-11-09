@@ -53,14 +53,14 @@ def create_rawlayer():
         .option("header", True).save("C:\\project_log_files_internal\\src\\internal_files\\raw_log_file.csv")
 
     sfOptions = {
-        "sfURL": r"https://hisswyy-qi52071.snowflakecomputing.com/",
-        "sfAccount": "su57550",
-        "sfUser": "sunil",
-        "sfPassword": "Cloud@123",
-        "sfDatabase": "KAVERI_DB",
-        "sfSchema": "PUBLIC",
-        "sfWarehouse": "COMPUTE_WH",
-        "sfRole": "ACCOUNTADMIN"
+        "sfURL": "sfURL",
+        "sfAccount":"sfAccount",
+        "sfUser": "sfUser",
+        "sfPassword": "sfPassword",
+        "sfDatabase": "sfDatabase",
+        "sfSchema": "sfSchema",
+        "sfWarehouse": "sfWarehouse",
+        "sfRole": "sfRole"
     }
     df_col1.coalesce(1).write.format("snowflake").options(**sfOptions)\
         .option("dbtable","{}".format(r"raw_log_details")).mode("overwrite").options(header=True).save()

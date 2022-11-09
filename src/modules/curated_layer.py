@@ -55,14 +55,14 @@ def log_curated_layer():
 
     # SnowflakeHelper().save_df_to_snowflake(final_curated, env.sf_curated_table)
     sfOptions = {
-        "sfURL": r"https://hisswyy-qi52071.snowflakecomputing.com/",
-        "sfAccount": "su57550",
-        "sfUser": "sunil",
-        "sfPassword": "Cloud@123",
-        "sfDatabase": "KAVERI_DB",
-        "sfSchema": "PUBLIC",
-        "sfWarehouse": "COMPUTE_WH",
-        "sfRole": "ACCOUNTADMIN"
+        "sfURL": "sfURL",
+        "sfAccount":"sfAccount",
+        "sfUser": "sfUser",
+        "sfPassword": "sfPassword",
+        "sfDatabase": "sfDatabase",
+        "sfSchema": "sfSchema",
+        "sfWarehouse": "sfWarehouse",
+        "sfRole": "sfRole"
     }
     final_curated.coalesce(1).write.format("snowflake").options(**sfOptions) \
         .option("dbtable", "{}".format(r"curated_log_details")).mode("overwrite").options(header=True).save()
@@ -105,14 +105,14 @@ def log_curated_layer():
 
     # SnowflakeHelper().save_df_to_snowflake(log_agg_per_device, env.sf_log_agg_per_device_table)
     sfOptions = {
-        "sfURL": r"https://hisswyy-qi52071.snowflakecomputing.com/",
-        "sfAccount": "su57550",
-        "sfUser": "sunil",
-        "sfPassword": "Cloud@123",
-        "sfDatabase": "KAVERI_DB",
-        "sfSchema": "PUBLIC",
-        "sfWarehouse": "COMPUTE_WH",
-        "sfRole": "ACCOUNTADMIN"
+        "sfURL": "sfURL",
+        "sfAccount":"sfAccount",
+        "sfUser": "sfUser",
+        "sfPassword": "sfPassword",
+        "sfDatabase": "sfDatabase",
+        "sfSchema": "sfSchema",
+        "sfWarehouse": "sfWarehouse",
+        "sfRole": "sfRole"
     }
     log_agg_per_device.coalesce(1).write.format("snowflake").options(**sfOptions) \
         .option("dbtable", "{}".format(r"log_agg_per_devices")).mode("overwrite").options(header=True).save()
@@ -161,14 +161,14 @@ def log_curated_layer():
     per_device_hive = spark.sql("select count(*) from log_agg_per_device").show()
 
     sfOptions = {
-        "sfURL": r"https://hisswyy-qi52071.snowflakecomputing.com/",
-        "sfAccount": "su57550",
-        "sfUser": "sunil",
-        "sfPassword": "Cloud@123",
-        "sfDatabase": "KAVERI_DB",
-        "sfSchema": "PUBLIC",
-        "sfWarehouse": "COMPUTE_WH",
-        "sfRole": "ACCOUNTADMIN"
+        "sfURL": "sfURL",
+        "sfAccount": "sfAccount",
+        "sfUser": "sfUser",
+        "sfPassword": "sfPassword",
+        "sfDatabase": "sfDatabase",
+        "sfSchema": "sfSchema",
+        "sfWarehouse": "sfWarehouse",
+        "sfRole": "sfRole"
     }
     log_agg_across_device.coalesce(1).write.format("snowflake").options(**sfOptions) \
         .option("dbtable", "{}".format(r"log_agg_across_devices")).mode("overwrite").options(header=True).save()
