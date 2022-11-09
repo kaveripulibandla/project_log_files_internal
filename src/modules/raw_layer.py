@@ -6,6 +6,7 @@ from pyspark.sql.functions import *
 from pyspark.sql.types import *
 import pyspark.sql.functions as F
 from pyspark.sql.functions import regexp_replace
+from pyspark.sql.window import Window
 
 
 def create_rawlayer():
@@ -23,6 +24,7 @@ def create_rawlayer():
     df.show(truncate = False)
 
     """# Giving col names to each columns"""
+    # windowspec= Window.orderBy("client_ip")
 
     df_col = (df.select(
         F.monotonically_increasing_id().alias('row_id'),
@@ -33,17 +35,17 @@ def create_rawlayer():
         F.col("_c6").alias("status_code"),
         F.col("_c7").alias("size"),
         F.col("_c8").alias("referrer"),
-        F.col("_c9").alias("user_agent")
-        ))
+        F.col("_c9").alias("user_agent")))\
+        # .withColumn("row_id",row_number().over(windowspec))
 
     df_col.printSchema()
     df_col.show(truncate = False)
 
-    df_col1 = df_col.withColumn('datetime', regexp_replace('datetime', '\[|\]|', '')) \
-        .dropDuplicates(["client_ip", "datetime", "method"]) \
-        .drop("row_id") \
-        .withColumn('row_id', monotonically_increasing_id()) \
-        .select('row_id', 'client_ip', 'datetime', 'method', 'request', 'status_code','size','referrer','user_agent')
+    df_col1 = df_col.withColumn('datetime', regexp_replace('datetime', '\[|\]|', ''))
+    #     .dropDuplicates(["client_ip", "datetime", "method"]) \
+    #     .drop("row_id") \
+    #     .withColumn('row_id', monotonically_increasing_id()) \
+    #     .select('row_id', 'client_ip', 'datetime', 'method', 'request', 'status_code','size','referrer','user_agent')
 
     df_col1.show(truncate=False)
 
@@ -62,12 +64,12 @@ def create_rawlayer():
     }
     df_col1.coalesce(1).write.format("snowflake").options(**sfOptions)\
         .option("dbtable","{}".format(r"raw_log_details")).mode("overwrite").options(header=True).save()
-
-    # SnowflakeHelper().save_df_to_snowflake(df_col, env.sf_raw_table)
+    #
+    # # SnowflakeHelper().save_df_to_snowflake(df_col, env.sf_raw_table)
 
     # save raw data in s3
     # df_col.write.mode("overwrite").format('csv').option("header",True).save("s3://databrickskaveri/final_layer/Raw/raw_log_details")
-
+    #
     """"" # RAW_DATA HIVE TABLE """""
     df_col1.coalesce(1).write.mode("overwrite").saveAsTable("raw_log_details")
     df_log = spark.sql("select * from raw_log_details")

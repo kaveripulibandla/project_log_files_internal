@@ -22,13 +22,16 @@ def log_cleansed_layer():
     df = spark.read.option("header", True)\
         .csv("C:\\project_log_files_internal\\src\\internal_files\\raw_log_file.csv")
 
+    df = df.drop(col("row_id")).dropDuplicates().withColumn("row_id", monotonically_increasing_id())
+    df1 = df.select('row_id', 'client_ip', 'datetime', 'method', 'request', 'status_code', 'size', 'referrer','user_agent')
+
     # df = spark.read.option("delimiter", " ").csv("s3://managed-kafka-kaveri-new/kafka_log_files/file-topic/0/299999.text")
 
-    df.show(truncate=False)
+    df1.show(truncate=False)
 
     """## ##Log_details(Cleansed_layer)"""
 
-    df_date = df.withColumn("datetime", to_timestamp("datetime", "dd/MMM/yyyy:HH:mm:ss")).withColumn('datetime',
+    df_date = df1.withColumn("datetime", to_timestamp("datetime", "dd/MMM/yyyy:HH:mm:ss")).withColumn('datetime',
                                                                                                            date_format(
                                                                                                                col("datetime"),
                                                                                                                "MM/dd/yyyy HH:mm:ss"))
